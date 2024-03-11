@@ -50,34 +50,34 @@ namespace VolgaVM
                         mc[ab] = y;
                         break;
                     //LDA #
-                    case 0xA0:
+                    case 0xA1:
                         ReadValue();
                         a = rb;
                         break;
                     //LDX #
-                    case 0xA1:
+                    case 0xA2:
                         ReadValue();
                         x = rb;
                         break;
                     //LDY #
-                    case 0xA2:
+                    case 0xA3:
                         ReadValue();
                         y = rb;
                         break;
                     //LDA a
-                    case 0xA8:
+                    case 0xA9:
                         ReadAddress();
                         ReadValue(true);
                         a = rb;
                         break;
                     //LDX a
-                    case 0xA9:
+                    case 0xAA:
                         ReadAddress();
                         ReadValue(true);
                         x = rb;
                         break;
                     //LDY a
-                    case 0xAA:
+                    case 0xAB:
                         ReadAddress();
                         ReadValue(true);
                         y = rb;
