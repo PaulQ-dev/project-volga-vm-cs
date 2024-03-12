@@ -5,7 +5,7 @@ namespace VolgaVM
 {
     public class Machine
     {
-        private ushort pc, ab = 0x0000; public static readonly ushort cs = 0x4000, ci = 0x4001, co = 0x4002, cc = 0x4003, sb = 0x4100; //Program Counter, Address Buffer, Console State, Console Input, Console Output, Console Color, Stack Base
+        private ushort pc, ab = 0x0000; public static readonly ushort cs = 0x8100, ci = 0x8101, co = 0x8102, cc = 0x8103, sb = 0x8000; //Program Counter, Address Buffer, Console State, Console Input, Console Output, Console Color, Stack Base
         private byte rb = 0x00, a = 0x00, x = 0x00, y = 0x00, sp = 0x00; //Read Buffer, A-reg, X-reg, Y-reg, Stack Pointer
         private readonly MemoryController mc;
 

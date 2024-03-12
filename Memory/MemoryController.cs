@@ -6,10 +6,10 @@ namespace VolgaVM.Memory
     {
         public MemoryCell[] cells =
         {
-            (0x0000,0x4000,true), //RAM
-            (0x4000,0x0010,true), //CONSOLE
-            (0x4100,0x0100,true), //STACK
-            (0xF000,0x1000,false) //ROM
+            (0x0000,0x8000,true), //RAM
+            (0x8000,0x0100,true), //STACK
+            (0x8100,0x0010,true), //REGS
+            (0x9000,0x7000,false) //ROM
         };
         readonly private byte[] memory = new byte[ushort.MaxValue];
         public byte? this[ushort address]
