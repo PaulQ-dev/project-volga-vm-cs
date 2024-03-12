@@ -15,7 +15,7 @@ namespace VolgaVM
             {
                 byte exit_code = 0;
                 bool run = true;
-                rb = mc[pc] ?? rb;
+                ReadValue();
                 switch (rb)
                 {
                     //HLT
@@ -26,6 +26,13 @@ namespace VolgaVM
                     case 0x01:
                         run = false;
                         ReadValue();
+                        exit_code = rb;
+                        goto exit;
+                    //HLT a
+                    case 0x02:
+                        run = false;
+                        ReadAddress();
+                        ReadValue(true);
                         exit_code = rb;
                         goto exit;
                     //STM a #
@@ -48,6 +55,13 @@ namespace VolgaVM
                     case 0x8B: 
                         ReadAddress();
                         mc[ab] = y;
+                        break;
+                    //STM (a) #
+                    case 0x98:
+                        ReadAddress();
+                        ReadAddress(true);
+                        ReadValue();
+                        mc[ab] = rb;
                         break;
                     //LDA #
                     case 0xA1:
@@ -85,7 +99,7 @@ namespace VolgaVM
                 }
                 pc++;
             exit:
-                if (run) return exit_code;
+                if (!run) return exit_code;
             }
         }
         /// <summary>
@@ -100,12 +114,29 @@ namespace VolgaVM
         /// <summary>
         /// Reads two bytes from machine memory and writes it to address buffer
         /// </summary>
-        private void ReadAddress()
+        private void ReadAddress(bool useBuffer = false)
         {
-            pc++; rb = mc[pc] ?? rb;
-            ab = rb;
-            pc++; rb = mc[pc] ?? rb;
-            ab += (ushort)(rb * 0x0100);
+            if (useBuffer){
+                rb = mc[ab] ?? rb;
+                PushStack(rb);
+                ab++;
+                rb = mc[ab] ?? rb;
+                ab = (ushort)(PullStack() + rb * 0x0100);
+            }
+            else{
+                pc++; rb = mc[pc] ?? rb;
+                ab = rb;
+                pc++; rb = mc[pc] ?? rb;
+                ab += (ushort)(rb * 0x0100);
+            }
+        }
+        private void PushStack(byte value){
+            sp++;
+            mc[(ushort)(sb+sp)] = value;
+        }
+        private byte PullStack(){
+            sp--;
+            return mc[(ushort)(sb+sp+1)] ?? rb;
         }
 
         public Machine(byte[] rom)
@@ -119,12 +150,12 @@ namespace VolgaVM
             {
                 mc[(ushort)(i + mc.cells[(int)Cells.ROM].Start)] = rom[i];
             }
-            pc = (ushort)((mc[0xFFFC] ?? rb) + 0x0100 * (mc[0xFFFD] ?? rb));
+            pc = (ushort)((mc[0x9000] ?? rb) + 0x0100 * (mc[0x9001] ?? rb));
         }
 
         public static void Run(byte[] rom)
         {
-            new Machine(rom).RunMachine();
+            System.Console.WriteLine(new Machine(rom).RunMachine());
         }
     }
 }
