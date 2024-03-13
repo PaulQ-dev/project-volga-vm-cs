@@ -1,7 +1,9 @@
 ﻿
+using System;
+
 namespace VolgaVM.Memory
 {
-    internal enum Cells { RAM, CONSOLE, ROM }
+    internal enum Cells { RAM, STACK, REGS, ROM }
     internal class MemoryController
     {
         public MemoryCell[] cells =
@@ -34,6 +36,18 @@ namespace VolgaVM.Memory
                         memory[address] = value ?? 0;
                     }
                 }
+            }
+        }
+        public MemoryController(byte[] rom) 
+        {
+            if (rom.Length > cells[(int)Cells.ROM].Length)
+            {
+                throw new OverflowException();
+            }
+            for (ushort i = 0; i < rom.Length; i++)
+            {
+                ushort index = (ushort)(i + cells[(int)Cells.ROM].Start);
+                memory[index] = rom[i];
             }
         }
     }

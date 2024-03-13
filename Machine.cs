@@ -63,6 +63,24 @@ namespace VolgaVM
                         ReadValue();
                         mc[ab] = rb;
                         break;
+                    //STA (a)
+                    case 0x99:
+                        ReadAddress();
+                        ReadAddress(true);
+                        mc[ab] = a;
+                        break;
+                    //STX (a)
+                    case 0x9A:
+                        ReadAddress();
+                        ReadAddress(true);
+                        mc[ab] = x;
+                        break;
+                    //STY (a)
+                    case 0x9B:
+                        ReadAddress();
+                        ReadAddress(true);
+                        mc[ab] = y;
+                        break;
                     //LDA #
                     case 0xA1:
                         ReadValue();
@@ -97,7 +115,6 @@ namespace VolgaVM
                         y = rb;
                         break;
                 }
-                pc++;
             exit:
                 if (!run) return exit_code;
             }
@@ -109,7 +126,7 @@ namespace VolgaVM
         private void ReadValue(bool useBuffer = false)
         {
             if (useBuffer) rb = mc[ab] ?? rb;
-            else pc++; rb = mc[pc] ?? rb;
+            else { rb = mc[pc] ?? rb; pc++; }
         }
         /// <summary>
         /// Reads two bytes from machine memory and writes it to address buffer
@@ -124,9 +141,9 @@ namespace VolgaVM
                 ab = (ushort)(PullStack() + rb * 0x0100);
             }
             else{
-                pc++; rb = mc[pc] ?? rb;
+                rb = mc[pc] ?? rb; pc++;
                 ab = rb;
-                pc++; rb = mc[pc] ?? rb;
+                rb = mc[pc] ?? rb; pc++;
                 ab += (ushort)(rb * 0x0100);
             }
         }
@@ -141,15 +158,7 @@ namespace VolgaVM
 
         public Machine(byte[] rom)
         {
-            mc = new();
-            if (rom.Length > mc.cells[(int)Cells.ROM].Length)
-            {
-                throw new OverflowException();
-            }
-            for (ushort i = 0; i < rom.Length; i++)
-            {
-                mc[(ushort)(i + mc.cells[(int)Cells.ROM].Start)] = rom[i];
-            }
+            mc = new(rom);
             pc = (ushort)((mc[0x9000] ?? rb) + 0x0100 * (mc[0x9001] ?? rb));
         }
 
